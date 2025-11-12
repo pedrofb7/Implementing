@@ -39,3 +39,21 @@ void enqueue(queue *Q, int x) {
 
     Q->size++;
 }
+
+int dequeue(queue *Q) {
+    if (Q->start == NULL) return -1;
+
+    node *temp = Q->start;
+    int res = temp->val;
+
+    Q->start = Q->start->next;
+
+    // se fosse o ultimo elemento da fila torna end nulo
+    if (Q->start == NULL) {
+        Q->end = NULL;
+    }
+
+    free(temp);
+
+    return res;
+}
