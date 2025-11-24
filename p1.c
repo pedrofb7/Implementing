@@ -4,14 +4,14 @@
 typedef struct node{
 	
 	struct node *prev; //aponta para o node anterior
-	int val;    //valor deste node
+	long long int val;    //valor deste node
 
 	}node;
 
 typedef struct {
 
 	node *top; //aponta para o topo da pilha
-	int size;
+	long long int size;
 
 	}stack;
 
@@ -22,8 +22,8 @@ void init_stack(stack *S) {
 	S->size = 0;
 }
 
-//função para inserir na pilha
-void push(stack *S, int x) {
+//funcao para inserir na pilha
+void push(stack *S, long long int x) {
 
 	//criando o novo node
 	node *new = (node *)malloc(sizeof(node));
@@ -35,7 +35,7 @@ void push(stack *S, int x) {
 	
 }
 
-int pop(stack *S) {
+long long int pop(stack *S) {
 
 	if (S->top ==NULL) return -1;
 		
@@ -51,7 +51,7 @@ int pop(stack *S) {
 	return res;
 }
 
-int print_top(stack *S) {
+long long int print_top(stack *S) {
 
 	if (S->top ==NULL) return -1;
 	
@@ -73,30 +73,31 @@ int main () {
 
 		char a;
 		scanf(" %c", &a);
+		
+		long long int x;
+		node *curr = pilha->top;
 
 		switch (a) {
 
 			case 'I':
-			     int x;
-			     scanf("%d", &x);
+			     scanf("%lld", &x);
 
 			     push(pilha, x);
 			     break;
 
 			case 'R':
-			     printf("%d\n", pop(pilha));
+			     printf("%lld\n", pop(pilha));
 			     break;
 
 			case 'T':
-			     printf("%d\n", print_top(pilha));
+			     printf("%lld\n", print_top(pilha));
 			     break;
 
 			case 'S':
-			     printf("%d\n", pilha->size);
+			     printf("%lld\n", pilha->size);
 			     break;
 
 			case 'C':
-			     node *curr = pilha->top;
 
 			     while(curr != NULL) {
 
@@ -114,7 +115,7 @@ int main () {
 			     	node *curr = pilha->top;
 			     	while(curr != NULL) {
 
-				     printf("%d ", curr->val);
+				     printf("%lld ", curr->val);
 				     curr = curr->prev;
 
 			     }

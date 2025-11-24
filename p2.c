@@ -3,7 +3,7 @@
 
 
 //-------------------------------
-// Definições
+// Definicoes
 //-------------------------------
 
 typedef struct node{
@@ -29,24 +29,24 @@ typedef struct queue {
 
 
 //-------------------------------
-// Funções
+// Funcoes
 //-------------------------------
 
-//função para inicializar a pilha
+//funcao para inicializar a pilha
 void init_stack(stack *S) {
 
 	S->top = NULL;
 	S->size = 0;
 }
 
-//funçãp para inicializar a fila
+//funcao para inicializar a fila
 void init_queue(queue *Q, stack *S) {
 
 	Q->tops = S;
 	Q->size = 0;
 }
 
-//função para inserir na pilha
+//funcao para inserir na pilha
 void push(stack *S, int x) {
 
 	//criando o novo node
@@ -165,7 +165,7 @@ int print_top(queue *Q) {
 int main() {
 
 	//-----------------------------
-	// Alocações
+	// Alocacoes
 	//-----------------------------
 
 	//criando e inicializando as duas pilhas
@@ -189,7 +189,7 @@ int main() {
 	stack *ncurr_s = S2;
 
 	//-----------------------------
-	// Início
+	// Inicio
 	//-----------------------------
 	
 	long long int q;
@@ -200,10 +200,11 @@ int main() {
 		char a;
 		scanf(" %c", &a);
 
+		int x;
+
 		switch(a) {
 
 			case 'I':
-			      int x;
 			      scanf("%d", &x);
 
 			      enqueue(Q, &curr_s, &ncurr_s, &top_s, x);
