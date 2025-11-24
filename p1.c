@@ -66,8 +66,8 @@ int main () {
 	init_stack(pilha);
 
 	//requisitando o numero de operacoes do usuario
-	int q;
-	scanf("%d", &q);
+	long long int q;
+	scanf("%lld", &q);
 
 	while (q--) {
 
