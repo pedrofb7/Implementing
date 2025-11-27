@@ -52,8 +52,74 @@ int dequeue(queue *Q) {
     if (Q->start == NULL) {
         Q->end = NULL;
     }
+    Q->size--;
 
     free(temp);
 
     return res;
+}
+
+int main () {
+    queue *fila = (queue *)malloc(sizeof(queue));
+    create(fila);
+    int q;
+    scanf(" %d", &q);
+    while (q--) {
+        int x;
+        char a;
+        scanf(" %c", &a);
+            switch (a) {
+            case 'I':
+                scanf(" %d", &x);
+                enqueue(fila, x);
+                break;
+            
+            case 'R':
+                printf("%d\n", dequeue(fila));
+                break;
+            
+            case 'F':
+                if (fila->start == NULL) {
+                    printf("%d\n", -1);
+                }
+                else {
+                    printf("%d\n", (fila->start)->val);
+                }
+                break;
+            
+            case 'B':
+                if (fila->end == NULL) {
+                    printf("%d\n", -1);
+                }
+                else {
+                    printf("%d\n", (fila->end)->val);
+                }
+                break;
+            
+            case 'S':
+                printf("%d\n", fila->size);
+                break;
+            
+            case 'C':
+                while (fila->start != NULL) {
+                    dequeue(fila);
+                }
+                break;
+            
+            case 'P':
+                if (fila->start != NULL) {
+                    node *temp = fila->start;
+                    while (temp != NULL) {
+                        printf("%d ", temp->val);
+                        temp = temp->next;
+                    }
+                }
+                printf("\n");
+                break;
+            
+            default:
+                break;
+            }
+    }
+    return 0;
 }
