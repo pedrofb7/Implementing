@@ -18,14 +18,14 @@ void create(lista *L) {
     L->size = 0;
 }
 
-void enlista(lista *L, int p, int x) {
-    if (p < 0 || p > L->size) {
+void enlista(lista *L, int p, int x) { //insere em alguma posição especificada no parametro p
+    if (p < 0 || p > L->size) { // verifica se ta fora dos índices
         printf("-1\n");
         return;
     }
     node *new = (node *)malloc(sizeof(node));
     new->val = x;
-    if (p == 0) {
+    if (p == 0) { // caso especial de início
         new->next = L->start;
         L->start = new;
         L->size++;
@@ -33,12 +33,12 @@ void enlista(lista *L, int p, int x) {
     }
     new->next = L->start;
     int i = 0;
-    while (i != p - 1) {
+    while (i != p - 1) { //empurra o nodulo alvo até ser um antes do indice que voce quer inserir
         i++;
         new->next = (new->next)->next;
     }
-    node *temp = (new->next)->next;
-    (new->next)->next = new;
+    node *temp = (new->next)->next; // aponta temp pra um depois do indice que voce quer inserir
+    (new->next)->next = new; 
     new->next = temp;
     L->size++;
 }
@@ -56,13 +56,13 @@ void delista(lista *L, int p) {
         return;
     }
     int i = 0;
-    while (i != p - 1) {
+    while (i != p - 1) { //empurra o nodulo alvo até ser um antes do indice que voce quer apagar
         temp = temp->next;
         i++;
     }
-    node *temp2 = temp->next;
-    temp->next = temp2->next;
-    free(temp2);
+    node *temp2 = temp->next; //auxiliar em cima do elemento que vai ser removido
+    temp->next = temp2->next; //elemento anterior ao que vai ser retirado passa a apontar para o elemento depois do q vai ser removido
+    free(temp2); //libera o que vai ser removido
     L->size--;
 }
 
