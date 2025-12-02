@@ -1,216 +1,255 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <string.h>
 
-//-------------------
-// Definicoes
-//-------------------
+//------------------
+//Definicoes
+//------------------
 
+//estrutura node
 typedef struct node {
 
-	struct node *prev;	//node anterior na pilha
-	char term;		//character desse node
-	int prec;		//precedencia do caracter, vai de 0 a 3
-
+	struct node *prev;	//ponteiro para o node anterior da pilha
+	char term;		//caractere do node
+	int prec;		//a precedencia do termo caso seja um operador
 }node;
 
+//estrutura stack
 typedef struct stack {
 
 	node *top;
-
+	int size;
 }stack;
 
-//-------------------
-// Funcoes
-//-------------------
 
-//inicializar
+//------------------
+//Funcoes
+//------------------
+
+//inicializar pilha
 void init_stack(stack *S) {
 
 	S->top = NULL;
+	S->size = 0;
 }
 
 //inserir
-void push(stack *S, char c, int x) {
+int push(stack *S, char c) {
 
 	node *new = (node *)malloc(sizeof(node));
-	new->prev = S->top;
+	int preced;	//precedencia do novo node
 
 	new->term = c;
-	new->prec = x;
-	S->top = new;
 
+	//avaliando o caracter que foi empilhado
+	switch(c) {
+
+		case '(':
+		case ')':
+			preced = 0;
+			break;
+
+		case '+':
+		case '-':
+			preced = 1;
+			break;
+
+		case '*':
+		case '/':
+			preced = 2;
+			break;
+		case '^':
+			preced = 3;
+			break;
+
+	}
+
+	new->prec = preced;
+
+	new->prev = S->top;
+	S->top = new;
 }
 
 //remover
 char pop(stack *S) {
 
 	node *temp = S->top;
-	S->top = S->top->prev;
-
 	char res = temp->term;
 
-	free(temp);
+	S->top = S->top->prev;	//tornando o node anterior o novo topo da pilha
 
+	free(temp);
 	return res;
 }
 
-//funcao para tratar os caracteres
-void translate(stack *S, char c) {
-
-	if(isdigit(c) || isalpha(c)) printf("%c ", c);	//printa se for uma variavel ou numero
+//funcao para traduzir
+void translate(stack *S, char entrada) {
 	
-	else if(c == '(') push(S, c, 0);		//insere na pilha se for '('	
 
-	else if(c == '+'|| c == '-'|| c == '*' || c == '/' || c == '^') {
+		if (isdigit(entrada) || isalpha(entrada)) printf("%c ", entrada);	//print imadiato se for um digito ou letra
 
-		int prec; //precedencia do operador utilizado
-		
-		switch(c) {
+		//devemos empilhar operadores + e -, mas apenas se o operador empilhado anteriormente for menor
+		else if(entrada == '+' || entrada == '-') {
 
-			case '+':
-				prec = 1;
-				break;
-			case '-':
-				prec = 1;
-				break;
-			case '*':
-				prec = 2;
-				break;
-			case '/':
-				prec = 2;
-				break;
-			case '^':
-				prec = 3;
-				break;
+			int temp_prec = 1; //assumindo como precedencia 1
 
-		}
-		
-		if(S->top == NULL || S->top->prec < prec) push(S, c, prec);
-
-		else if(prec == 3) push(S, c, prec);
-
-		else {
-
-			while(S->top != NULL && S->top->prec >= prec && S->top->term != '(') {
+			//desempilhado e imprimindo enquanto houver operadores de precedencia maior ou igual na pilha
+			while(S->top != NULL && S->top->prec >= temp_prec ) {
 
 				printf("%c ", pop(S));
-
 			}
 
-			push(S, c, prec);
-		}
-	}
-
-	else {
-
-		while(S->top != NULL && S->top->term != '(') {
-
-			printf("%c ", pop(S));
+			push(S, entrada);
 		}
 
-		pop(S);
 
-	}
+		//devemos empilhar operadores * e /, mas apenas se o operador empilhado anteriormente for menor
+		else if(entrada == '*' || entrada == '/') {
+
+			int temp_prec = 2; //assumindo como precedencia 2
+
+			//desempilhado e imprimindo enquanto houver operadores de precedencia maior ou igual na pilha
+			while(S->top != NULL && S->top->prec >= temp_prec ) {
+
+				printf("%c ", pop(S));
+			}
+
+			push(S, entrada);
+		}
+
+
+		else if(entrada == '^') {
+
+			push(S, entrada); //^ deve ser empilhado em todas as ocasioes para o funcionamento do algoritmo
+		}
+
+		else if (entrada == '(') push(S, entrada); //aberturas de escopo sao empilhadas
+
+		//ao fechar um escopo deve-se imprimir a pilha inteira até que se ache uma abertura de escopo
+		else if (entrada == ')') {
+
+			while(S->top->term != '(') {
+
+				printf("%c ", pop(S)); //printa todos os elementos da pilha (menos '(' )
+			}
+
+			pop(S); //desempilhando o '('
+		}
+
 }
 
+int main () {
 
-
-int main() {
-
-	stack *R = (stack *)malloc(sizeof(stack)); //stack de leitura
-	init_stack(R);
-
-	stack *S = (stack *)malloc(sizeof(stack)); //stack de trabalho
+	stack *S = (stack *)malloc(sizeof(stack));
 	init_stack(S);
 
-	char c;
+	char entrada[1000];
+
+	while(fgets(entrada, sizeof(entrada), stdin) != NULL) {
+
+		long long int len = strlen(entrada);
+
+		if(entrada[len-1] == '\n') {
+
+			entrada[len-1] = '\0';
+			len--;
+		}
+
+		if (len == 0) continue;
+
+		//variavei de validacao
+		int invalid = 0;
+		int closes = 0;
+
+        // Removendo os espaços
+        char temp[1000];
+        int j = 0;
+        for(int i = 0; i < len; i++){
+
+            if(entrada[i] != ' ' && entrada[i] != '\t'){
+
+                temp[j++] = entrada[i];
+            }
+        }
+        
+        temp[j] = '\0'; //final da string temporaria
+        
+        printf("%s\n", temp);
+
+		for(int i = 0; i < len; i++) {
+
+			if(isalpha(temp[i])) {
+
+				//a entrada será invalida se o caracter for uma letra minúscula ou se o caracter anterior for uma letra
+				if (!isupper(temp[i]) || (i > 0 && isalpha(temp[i-1]))) {
+					invalid = 1;
+					break;
+				}
+			}
+
+			else if(isdigit(temp[i])) {
+
+				if(i > 0 && isdigit(temp[i-1])) {
+
+					invalid = 1;
+					break;
+				}
+			}
+
+
+			else if(temp[i] == '+' || temp[i] == '-' ||temp[i] == '*' ||temp[i] == '/' || temp[i] == '^') {
+
+
+			  if(i > 0 && (temp[i-1] == '+' || temp[i-1] == '-' ||temp[i-1] == '*' ||temp[i-1] == '/' || temp[i-1] == '^' )) {
+
+					invalid = 1;
+					break;
+
+				}
+			}
+
+			else if(temp[i] == '(') closes--;
+
+			//se for um fechamento de escopo e nao houver nenhum escopos abertos correspondentes sera invalido
+			else if(temp[i] == ')') {
+				if(closes >=0) {
+					invalid = 1;
+					break;
+				}
+
+				closes++;
+			}
+			
+
+
+
+		}
+
+
+			if(closes != 0) invalid =1;
+
+			if (invalid) printf("Expressao invalida\n");
+
+			else {
+				for (int i = 0; i < len; i++)  {
+
+					translate(S, temp[i]);
+
+				}
+
+				while(S->top !=NULL) printf("%c ", pop(S));
+				printf("\n");
+
+			}
+
+			printf("\n");
 	
-	//variavel de checagem
-	int eval = 1;
-	char prev = '@';
-	int closes = 0;
-
-	while(1) {
-
-		scanf("%c", &c);
-		if(c == '\n') break;
-
-
-
-		else if((c == '+'|| c == '-'|| c == '*' || c == '/' || c == '^') && 
-		  (prev == '+'|| prev == '-'|| prev == '*' || prev == '/' || prev == '^' || prev == '@')) {
-
-			eval = 0;
-			break;
-		}
-
-		
-		else if(c == '(') closes -= 1;
-		else if(c == ')' && closes >= 0) {
-
-			eval = 0;
-			break;
-		}
-		else if (c == ')') closes += 1; 
-
-		prev = c;
-		
-		//inserindo em ordem na pilha de leitura
-		if (R->top == NULL) push(R, c, 0);
-		else {
-
-			while (R->top != NULL) {
-
-				char ch = pop(R);
-				push(S, ch, 0);		//usando a pilha de trabalho como auxiliar 
-			}
-
-			push(R, c, 0);
-
-			while(S->top != NULL) {
-
-				char ch = pop(S);
-				push(R, ch, 0);		//reinserindo na pilha de leitura
-
-			}
-		}
-
-	}
-
-	if(eval == 0 || closes != 0) printf("Expressao invalida\n");
-
-	else {
-
-		while(R->top != NULL) {
-
-			char ch = pop(R);
-			translate(S, ch);
-
-
-		}
-
-		while(S->top != NULL) {
-
-			printf("%c ", pop(S));
-
-		}
-
-		printf("\n");
-
 	}
 
 
 
-	return 0;
 }
-
-
-
-
-
-
-
 
 
 
