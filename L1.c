@@ -25,13 +25,12 @@ void enlista(lista *L, int p, int x) { //insere em alguma posição especificada
     }
     node *new = (node *)malloc(sizeof(node));
     new->val = x;
+    new->next = L->start;
     if (p == 0) { // caso especial de início
-        new->next = L->start;
         L->start = new;
         L->size++;
         return;
     }
-    new->next = L->start;
     int i = 0;
     while (i != p - 1) { //empurra o nodulo alvo até ser um antes do indice que voce quer inserir
         i++;
