@@ -100,7 +100,7 @@ void translate(stack *S, char entrada) {
 				printf("%c ", pop(S));
 			}
 
-			push(S, entrada);
+			push(S, entrada); //push do novo operador
 		}
 
 
@@ -115,7 +115,7 @@ void translate(stack *S, char entrada) {
 				printf("%c ", pop(S));
 			}
 
-			push(S, entrada);
+			push(S, entrada); //push do novo operador
 		}
 
 
@@ -144,10 +144,14 @@ int main () {
 	stack *S = (stack *)malloc(sizeof(stack));
 	init_stack(S);
 
-	char entrada[1000];
+	char entrada[1000]; //expressao que será avaliada
 
+	//lendo a entrada com fgets até achar nulo (ou EOF)
 	while(fgets(entrada, sizeof(entrada), stdin) != NULL) {
 
+		//obs: fgets no primeiro loop le do stdin ate achar '\n' e no proximo loop continua de onde parou
+		
+		//tamanho da entrada ate o primeiro '\n'
 		long long int len = strlen(entrada);
 
 		if(entrada[len-1] == '\n') {
@@ -156,15 +160,16 @@ int main () {
 			len--;
 		}
 
-		if (len == 0) continue;
+		if (len == 0) continue; //se a entrada for vazia nao faz nada
 
 		//variavei de validacao
-		int invalid = 0;
-		int closes = 0;
+		int invalid = 0; //valida a expressao
+		int closes = 0;  //checa se todos os escopos abertos foram fechados
 
         // Removendo os espaços
-        char temp[1000];
+        char temp[1000]; //varialvel de entrada temporaria sem os espacos
         int j = 0;
+
         for(int i = 0; i < len; i++){
 
             if(entrada[i] != ' ' && entrada[i] != '\t'){
@@ -175,7 +180,7 @@ int main () {
         
         temp[j] = '\0'; //final da string temporaria
         
-        printf("%s\n", temp);
+        printf("%s\n", temp); //expressao final
 
 		for(int i = 0; i < len; i++) {
 
@@ -190,6 +195,7 @@ int main () {
 
 			else if(isdigit(temp[i])) {
 
+				//a entrada sera invalida se o caracter for um digito e o anterior tambem
 				if(i > 0 && isdigit(temp[i-1])) {
 
 					invalid = 1;
@@ -201,6 +207,7 @@ int main () {
 			else if(temp[i] == '+' || temp[i] == '-' ||temp[i] == '*' ||temp[i] == '/' || temp[i] == '^') {
 
 
+			  //a entrada sera invalida se houver dois operadores seguidos
 			  if(i > 0 && (temp[i-1] == '+' || temp[i-1] == '-' ||temp[i-1] == '*' ||temp[i-1] == '/' || temp[i-1] == '^' )) {
 
 					invalid = 1;
@@ -209,46 +216,48 @@ int main () {
 				}
 			}
 
-			else if(temp[i] == '(') closes--;
+			else if(temp[i] == '(') closes--; //abrindo um escopo, cada escopo aberto adicionara -1
 
 			//se for um fechamento de escopo e nao houver nenhum escopos abertos correspondentes sera invalido
 			else if(temp[i] == ')') {
+	
 				if(closes >=0) {
+
 					invalid = 1;
 					break;
 				}
 
-				closes++;
+				closes++; //fechando um escopo, cada fechamento adicionara +1, 		
+			
 			}
 			
-
-
-
 		}
 
 
-			if(closes != 0) invalid =1;
+			if(closes != 0) invalid =1; //se closes acabar diferente de 0 nem todos os escopos abertos 
+						    //foram fechados e a expressao sera invalida
 
-			if (invalid) printf("Expressao invalida\n");
+
+			if (invalid) printf("Expressao invalida\n"); //autoexplicativo ._.
 
 			else {
+				//chama a funcao translate para cada um dos caracteres
 				for (int i = 0; i < len; i++)  {
 
 					translate(S, temp[i]);
 
 				}
 
+				//printa o resto da pilha para finalizar o algoritmo
 				while(S->top !=NULL) printf("%c ", pop(S));
 				printf("\n");
 
 			}
 
 			printf("\n");
-	
 	}
 
-
-
+	free(S);
 }
 
 

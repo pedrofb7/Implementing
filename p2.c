@@ -20,9 +20,10 @@ typedef struct {
 
 	}stack;
 
+//strutura de fila baseada em pilha
 typedef struct queue {
 
-	stack *tops;
+	stack *tops; //a fila contem um ponteiro para a pilha onde está o começo da fila atualmente
 	int size;
 
 	}queue;
@@ -89,7 +90,7 @@ void enqueue(queue *Q, stack **current_stack, stack **not_current_stack, stack *
 	//caso ja exista algum elemento na current_stack
 	else {
 
-		int size = (*current_stack)->size;
+		int size = (*current_stack)->size; //armazenando o tamanho da current_stack para recolocar os elementos de volta depois
 
 		//desempilhando da current_stack e empilhando na not_current_stack
 		while((*current_stack)->top != NULL) {
@@ -111,15 +112,12 @@ void enqueue(queue *Q, stack **current_stack, stack **not_current_stack, stack *
 
 	}
 
+		//alterando os ponteiros da current_stack e da not_current_stack para inverter as duas
 		stack *temp = *current_stack;
 		*current_stack = *not_current_stack;
 		*not_current_stack = temp;
 
-		temp = NULL;
-		free(temp);
-
-		Q->tops = *top_stack;
-
+	
 		Q->size +=1;
 }
 
@@ -129,13 +127,15 @@ int  dequeue(queue *Q, stack **top_stack, stack **not_top_stack) {
 
 	if(Q->size != 0) {
 
+		//tirando o primeiro elemento da top stack, que eh o primeiro elemento da fila
 		int res = pop(Q->tops);
 
+		//invertendo a top stack e a not top stack
 		stack *temp = *top_stack;
 		*top_stack = *not_top_stack;
 		*not_top_stack = temp;
 
-
+		//informando para a fila a nova top stack
 		Q->tops = *top_stack;
 		Q->size -=1;
 		
